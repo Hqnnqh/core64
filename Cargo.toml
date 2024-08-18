@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+    "core-kernel",
+    "core-loader",
+    "core-util",
+]
+resolver = "2"
