@@ -13,9 +13,8 @@ use uefi::{
     prelude::BootServices, table::boot::{AllocateType, PAGE_SIZE},
 };
 use uefi::data_types::PhysicalAddress;
+use uefi::table::boot::MemoryType;
 use core_util::memory::VirtualAddress;
-
-use crate::memory::KERNEL_CODE;
 
 /// Gets data of a file from filesystem
 pub(super) fn get_file_data(
@@ -67,7 +66,7 @@ pub(super) fn parse_elf(
 
     // allocate file data
     boot_services
-        .allocate_pages(AllocateType::Address(dest_start), KERNEL_CODE, num_pages)
+        .allocate_pages(AllocateType::Address(dest_start), MemoryType::LOADER_DATA, num_pages)
         .map_err(|error| format!("Could not allocate pages for kernel: {}", error))?;
 
     // Copy program segments of kernel into memory
