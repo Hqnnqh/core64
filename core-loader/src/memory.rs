@@ -28,8 +28,6 @@ pub(super) struct KernelInfo {
     pub(super) kernel_code_page_count: usize,
     pub(super) kernel_stack_address: PhysicalAddress,
     pub(super) kernel_stack_page_count: usize,
-    pub(super) framebuffer_address: PhysicalAddress,
-    pub(super) framebuffer_page_count: usize,
     pub(super) boot_info_address: PhysicalAddress,
 }
 
@@ -79,8 +77,6 @@ pub(super) fn set_up_address_space(
         kernel_code_page_count,
         kernel_stack_address,
         kernel_stack_page_count,
-        framebuffer_address,
-        framebuffer_page_count,
         boot_info_address,
     } = kernel_info;
 
@@ -135,16 +131,6 @@ pub(super) fn set_up_address_space(
         let physical_address = (PAGE_SIZE * page) as u64 + kernel_stack_address;
         let virtual_address = (PAGE_SIZE * page) as u64 + KERNEL_STACK_MAPPING_OFFSET;
         manager.map_memory(virtual_address, physical_address, PageEntryFlags::default())?;
-    }
-
-    // identity map framebuffer
-    for page in 0..framebuffer_page_count {
-        let physical_address = (PAGE_SIZE * page) as u64 + framebuffer_address;
-        manager.map_memory(
-            physical_address,
-            physical_address,
-            PageEntryFlags::default(),
-        )?;
     }
 
     Ok((

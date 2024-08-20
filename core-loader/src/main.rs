@@ -14,9 +14,8 @@ use uefi::{
     Status, table::{Boot, boot::MemoryType, Runtime, SystemTable},
 };
 
-use core_util::{BootInfo, graphics::Color, memory::PAGE_SIZE};
+use core_util::{BootInfo, memory::PAGE_SIZE};
 
-use crate::graphics::testing_fb::RawFrameBuffer;
 use crate::memory::KernelInfo;
 
 mod file;
@@ -47,8 +46,6 @@ fn main(image_handle: Handle, mut system_table: SystemTable<Boot>) -> Status {
 
     // initialize framebuffer
     let framebuffer_metadata = graphics::initialize_framebuffer(boot_services).unwrap();
-    let framebuffer_address = framebuffer_metadata.base;
-    let framebuffer_page_count = (framebuffer_metadata.size + PAGE_SIZE - 1) / PAGE_SIZE;
 
     // allocate kernel stack
     let (kernel_stack_address, kernel_stack_page_count) =
@@ -57,43 +54,22 @@ fn main(image_handle: Handle, mut system_table: SystemTable<Boot>) -> Status {
     // allocate boot info
     let (boot_info_address, mmap_descriptors) = memory::allocate_boot_info(boot_services).unwrap();
 
-    let framebuffer = RawFrameBuffer::from(framebuffer_metadata);
-    for x in 20..100 {
-        framebuffer.draw_pixel(x, 350, Color::blue());
-    }
     let kernel_info = KernelInfo {
         kernel_code_address,
         kernel_code_page_count,
         kernel_stack_address,
         kernel_stack_page_count,
-        framebuffer_address,
-        framebuffer_page_count,
         boot_info_address,
     };
     // exit boot services
     let (_runtime, memory_map) = drop_boot_services(system_table, mmap_descriptors, &kernel_info);
-    qemu_print::qemu_println!("mmap: {:?}", memory_map);
-    for desc in memory_map.descriptors() {
-        qemu_print::qemu_println!("desc: {:?}", desc);
-    }
-    let framebuffer = RawFrameBuffer::from(framebuffer_metadata);
-    for x in 20..100 {
-        framebuffer.draw_pixel(x, 400, Color::yellow());
-    }
+
     // set up address space
-    let (pml4, rsp, virtual_boot_info_address) = memory::set_up_address_space(
-        &memory_map,
-        kernel_info
-    )
-    .unwrap();
+    let (pml4, rsp, virtual_boot_info_address) =
+        memory::set_up_address_space(&memory_map, kernel_info).unwrap();
 
     let boot_info = unsafe { &mut *(boot_info_address as *mut BootInfo) };
     boot_info.frame_buffer_metadata = framebuffer_metadata;
-
-    let framebuffer = RawFrameBuffer::from(framebuffer_metadata);
-    for x in 20..100 {
-        framebuffer.draw_pixel(x, 300, Color::red());
-    }
 
     unsafe {
         asm!(
@@ -119,9 +95,8 @@ fn main(image_handle: Handle, mut system_table: SystemTable<Boot>) -> Status {
 fn drop_boot_services(
     system_table: SystemTable<Boot>,
     mut descriptors: Vec<CoreMemoryDescriptor>,
-    kernel_info: &KernelInfo
+    kernel_info: &KernelInfo,
 ) -> (SystemTable<Runtime>, CoreMemoryMap) {
-
     // drop boot services
     let (runtime, uefi_mmap) = unsafe { system_table.exit_boot_services(MemoryType::LOADER_DATA) };
 
@@ -139,50 +114,55 @@ fn drop_boot_services(
         if descriptor.phys_start < first_addr {
             first_addr = descriptor.phys_start;
         }
-        if descriptor.phys_start < first_available_addr
+
+        if descriptor.phys_start != 0x0
             && matches!(
                 descriptor.ty,
                 MemoryType::CONVENTIONAL
                     | MemoryType::BOOT_SERVICES_CODE
                     | MemoryType::BOOT_SERVICES_DATA
             )
-            && descriptor.phys_start != 0x0
         {
-            first_available_addr = descriptor.phys_start;
+            if descriptor.phys_start < first_available_addr {
+                first_available_addr = descriptor.phys_start;
+            }
+            if phys_end > last_available_addr {
+                last_available_addr = phys_end;
+            }
         }
+
         if phys_end > last_addr {
-            last_addr = phys_end
-        }
-        if phys_end > last_available_addr
-            && matches!(
-                descriptor.ty,
-                MemoryType::CONVENTIONAL
-                    | MemoryType::BOOT_SERVICES_CODE
-                    | MemoryType::BOOT_SERVICES_DATA
-            )
-        {
-            last_available_addr = phys_end;
+            last_addr = phys_end;
         }
 
         let r#type = if descriptor.phys_start < 0x1000 {
             CoreMemoryType::Reserved
         }
         // mark mmap data as kernel data and boot info struct
-        else if (descriptor.phys_start <= desc_start_addr && phys_end >= desc_end_addr) || descriptor.phys_start <= kernel_info.boot_info_address && phys_end >= kernel_info.boot_info_address + PAGE_SIZE as u64 {
-           CoreMemoryType::KernelData
+        else if (descriptor.phys_start <= desc_start_addr && phys_end >= desc_end_addr)
+            || descriptor.phys_start <= kernel_info.boot_info_address
+                && phys_end >= kernel_info.boot_info_address + PAGE_SIZE as u64
+        {
+            CoreMemoryType::KernelData
         }
         // mark kernel file as kernel code
         else if descriptor.phys_start <= kernel_info.kernel_code_address
-            && phys_end >= kernel_info.kernel_code_address + (kernel_info.kernel_code_page_count * PAGE_SIZE) as u64 {
+            && phys_end
+                >= kernel_info.kernel_code_address
+                    + (kernel_info.kernel_code_page_count * PAGE_SIZE) as u64
+        {
             CoreMemoryType::KernelCode
         }
         // mark stack as kernel stack
-        else if descriptor.phys_start <= kernel_info.kernel_stack_address && phys_end >= kernel_info.kernel_stack_address + (kernel_info.kernel_stack_page_count * PAGE_SIZE) as u64 {
+        else if descriptor.phys_start <= kernel_info.kernel_stack_address
+            && phys_end
+                >= kernel_info.kernel_stack_address
+                    + (kernel_info.kernel_stack_page_count * PAGE_SIZE) as u64
+        {
             CoreMemoryType::KernelStack
-        }
-        else {
+        } else {
             // Determine the core memory type based on the UEFI memory type
-           match descriptor.ty {
+            match descriptor.ty {
                 MemoryType::CONVENTIONAL
                 | MemoryType::BOOT_SERVICES_DATA
                 | MemoryType::BOOT_SERVICES_CODE => CoreMemoryType::Available,
