@@ -29,7 +29,7 @@ This project is ideal for those who want to learn or build a custom operating sy
 For an example of how to extend and use Core64 as a base for your operating system, check out the [ChickenOS project](https://github.com/chickensoftware/os).
 
 ## Next Steps
-Core64 is just a minimal entry point for a kernel, and it currently lacks many of the essential features needed for a fully functioning operating system. As you continue to develop your OS, you'll need to implement memory management for the kernel itself, a gdt, interrupt handling, and many other features.
+Core64 is just a minimal entry point for a kernel, and it currently lacks many of the essential features needed for a fully functioning operating system. As you continue to develop your OS, you'll need to implement memory management for the kernel itself, a gdt, interrupt handling, and many other features. Additionally, the loader itself should have proper error handling and display each step of the environment setup.
 
 ## OS Resources
 
@@ -58,3 +58,5 @@ Boot Core64 on a real machine using an USB:
 ```sh
    make usb USB_DEVICE=/dev/<device> release=true
 ``` 
+
+A successful jump to the higher half kernel entry is indicated by the screen turning green.
