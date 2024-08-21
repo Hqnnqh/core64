@@ -1,15 +1,15 @@
-BOOTLOADER_DIR = core-loader
-KERNEL_DIR = core-kernel
-UTIL_DIR = core-util
+BOOTLOADER_DIR = core64-loader
+KERNEL_DIR = core64-kernel
+UTIL_DIR = core64-util
 
 TARGET_DIR_BOOTLOADER_DEBUG = target/x86_64-unknown-uefi/debug
 TARGET_DIR_BOOTLOADER_RELEASE = target/x86_64-unknown-uefi/release
 
-TARGET_DIR_KERNEL_DEBUG = target/x86_64-unknown-none-core/debug
-TARGET_DIR_KERNEL_RELEASE = target/x86_64-unknown-none-core/release
+TARGET_DIR_KERNEL_DEBUG = target/x86_64-unknown-none-core64_os/debug
+TARGET_DIR_KERNEL_RELEASE = target/x86_64-unknown-none-core64_os/release
 
-EFI_FILE = core-loader.efi
-KERNEL_FILE = core-kernel.elf
+EFI_FILE = core64-loader.efi
+KERNEL_FILE = core64-kernel.elf
 
 BUILD_DIR = build
 ESP_DIR = $(BUILD_DIR)/esp

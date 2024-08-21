@@ -14,7 +14,7 @@ use uefi::{
     Status, table::{Boot, boot::MemoryType, Runtime, SystemTable},
 };
 
-use core_util::{BootInfo, memory::PAGE_SIZE};
+use core64_util::{BootInfo, memory::PAGE_SIZE};
 
 use crate::memory::KernelInfo;
 
@@ -25,9 +25,9 @@ mod memory;
 const KERNEL_FILE_NAME: &str = "kernel.elf";
 const KERNEL_STACK_SIZE: usize = 1024 * 1024; // 1MiB
 
-type CoreMemoryMap = core_util::memory::MemoryMap;
-type CoreMemoryDescriptor = core_util::memory::MemoryDescriptor;
-type CoreMemoryType = core_util::memory::MemoryType;
+type CoreMemoryMap = core64_util::memory::MemoryMap;
+type CoreMemoryDescriptor = core64_util::memory::MemoryDescriptor;
+type CoreMemoryType = core64_util::memory::MemoryType;
 
 #[entry]
 fn main(image_handle: Handle, mut system_table: SystemTable<Boot>) -> Status {

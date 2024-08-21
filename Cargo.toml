@@ -1,8 +1,8 @@
 [workspace]
 
 members = [
-    "core-kernel",
-    "core-loader",
-    "core-util",
+    "core64-kernel",
+    "core64-loader",
+    "core64-util",
 ]
 resolver = "2"

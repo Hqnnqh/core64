@@ -1,5 +1,5 @@
 [package]
-name = "core-util"
+name = "core64-util"
 version = "0.1.0"
 edition = "2021"
 

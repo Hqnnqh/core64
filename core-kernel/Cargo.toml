@@ -1,8 +1,0 @@
-[package]
-name = "core-kernel"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-core-util = { path = "../core-util"}
-

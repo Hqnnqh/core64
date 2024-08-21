@@ -1,0 +1,8 @@
+[package]
+name = "core64-kernel"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+core64-util = { path = "../core64-util" }
+

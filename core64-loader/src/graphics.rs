@@ -5,7 +5,7 @@ use uefi::{
     proto::console::gop::{GraphicsOutput, PixelFormat},
 };
 
-use core_util::graphics::framebuffer::FrameBufferMetadata;
+use core64_util::graphics::framebuffer::FrameBufferMetadata;
 
 /// Initialize framebuffer (GOP)
 

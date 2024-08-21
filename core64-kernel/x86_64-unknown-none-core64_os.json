@@ -16,7 +16,7 @@
   "position-independent-executables": false,
   "pre-link-args": {
     "ld.lld": [
-      "-T./core-kernel/linker.ld"
+      "-T./core64-kernel/linker.ld"
     ]
   },
   "post-link-args": {

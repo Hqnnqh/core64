@@ -4,7 +4,7 @@
 use core::arch::asm;
 use core::panic::PanicInfo;
 
-use core_util::{BootInfo, graphics::Color};
+use core64_util::{BootInfo, graphics::Color};
 
 use crate::video::framebuffer::RawFrameBuffer;
 

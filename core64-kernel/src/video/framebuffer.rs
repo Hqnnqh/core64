@@ -1,6 +1,6 @@
 use core::{fmt::Debug, ptr::write_volatile};
 
-use core_util::graphics::{
+use core64_util::graphics::{
     Color,
     framebuffer::{BPP, FrameBufferMetadata},
 };

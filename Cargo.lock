@@ -48,17 +48,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e763eef8846b13b380f37dfecda401770b0ca4e56e95170237bd7c25c7db3582"
 
 [[package]]
-name = "core-kernel"
+name = "core64-kernel"
 version = "0.1.0"
 dependencies = [
- "core-util",
+ "core64-util",
 ]
 
 [[package]]
-name = "core-loader"
+name = "core64-loader"
 version = "0.1.0"
 dependencies = [
- "core-util",
+ "core64-util",
  "goblin",
  "log",
  "qemu_print",
@@ -66,7 +66,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "core-util"
+name = "core64-util"
 version = "0.1.0"
 dependencies = [
  "bitflags 2.6.0",

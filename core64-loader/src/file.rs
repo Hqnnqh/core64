@@ -14,7 +14,7 @@ use uefi::{
 };
 use uefi::data_types::PhysicalAddress;
 use uefi::table::boot::MemoryType;
-use core_util::memory::VirtualAddress;
+use core64_util::memory::VirtualAddress;
 
 /// Gets data of a file from filesystem
 pub(super) fn get_file_data(

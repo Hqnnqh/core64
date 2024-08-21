@@ -11,7 +11,7 @@ use uefi::{
     table::boot::{AllocateType::AnyPages, MemoryType},
 };
 
-use core_util::memory::{
+use core64_util::memory::{
     PAGE_SIZE,
     paging::{
         KERNEL_MAPPING_OFFSET,
